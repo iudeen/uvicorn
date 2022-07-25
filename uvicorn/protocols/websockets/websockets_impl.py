@@ -204,7 +204,7 @@ class WebSocketProtocol(WebSocketServerProtocol):
         self.handshake_started_event.set()
 
     async def ws_handler(  # type: ignore[override]
-            self, protocol: WebSocketServerProtocol, path: str
+        self, protocol: WebSocketServerProtocol, path: str
     ) -> Any:
         """
         This is the main handler function for the 'websockets' implementation
@@ -264,10 +264,13 @@ class WebSocketProtocol(WebSocketServerProtocol):
                     if name.lower() in _added_names:
                         continue
                     _added_names.append(name.lower())
-                    self.extra_headers.append((
-                        # ASGI spec requires bytes
-                        # But for compatibility we need to convert it to strings
-                        name.decode("latin-1"), value.decode("latin-1"))
+                    self.extra_headers.append(
+                        (
+                            # ASGI spec requires bytes
+                            # But for compatibility we need to convert it to strings
+                            name.decode("latin-1"),
+                            value.decode("latin-1"),
+                        )
                     )
                 self.handshake_started_event.set()
 
