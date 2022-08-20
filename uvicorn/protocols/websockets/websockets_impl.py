@@ -50,10 +50,10 @@ class WebSocketProtocol(WebSocketServerProtocol):
     extra_headers: List[Tuple[str, str]]
 
     def __init__(
-            self,
-            config: Config,
-            server_state: ServerState,
-            _loop: Optional[asyncio.AbstractEventLoop] = None,
+        self,
+        config: Config,
+        server_state: ServerState,
+        _loop: Optional[asyncio.AbstractEventLoop] = None,
     ):
         if not config.loaded:
             config.load()
@@ -102,7 +102,7 @@ class WebSocketProtocol(WebSocketServerProtocol):
         )
 
     def connection_made(  # type: ignore[override]
-            self, transport: asyncio.Transport
+        self, transport: asyncio.Transport
     ) -> None:
         self.connections.add(self)
         self.transport = transport
@@ -136,7 +136,7 @@ class WebSocketProtocol(WebSocketServerProtocol):
         self.tasks.discard(task)
 
     async def process_request(
-            self, path: str, headers: Headers
+        self, path: str, headers: Headers
     ) -> Optional[HTTPResponse]:
         """
         This hook is called to determine if the websocket should return
@@ -180,7 +180,7 @@ class WebSocketProtocol(WebSocketServerProtocol):
         return self.initial_response
 
     def process_subprotocol(
-            self, headers: Headers, available_subprotocols: Optional[Sequence[Subprotocol]]
+        self, headers: Headers, available_subprotocols: Optional[Sequence[Subprotocol]]
     ) -> Optional[Subprotocol]:
         """
         We override the standard 'process_subprotocol' behavior here so that
@@ -321,7 +321,7 @@ class WebSocketProtocol(WebSocketServerProtocol):
             raise RuntimeError(msg % message_type)
 
     async def asgi_receive(
-            self,
+        self,
     ) -> Union[
         "WebSocketDisconnectEvent", "WebSocketConnectEvent", "WebSocketReceiveEvent"
     ]:
