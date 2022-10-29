@@ -238,7 +238,7 @@ async def test_default_logging_with_fd(
     with caplog_for_logger(caplog, "uvicorn.access"):
         async with run_server(config):
             print(fd)
-
+        sock.listen()
         messages = [
             record.message for record in caplog.records if "uvicorn" in record.name
         ]
