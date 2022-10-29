@@ -207,7 +207,7 @@ async def test_default_logging_with_uds(
     )
     with caplog_for_logger(caplog, "uvicorn.access"):
         async with run_server(config):
-            transport = httpx.HTTPTransport(uds=short_socket_name)
+            transport = httpx.AsyncHTTPTransport(uds=short_socket_name)
             async with httpx.AsyncClient(transport=transport) as client:
                 response = await client.get("http://my")
         assert response.status_code == 204
