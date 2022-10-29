@@ -234,6 +234,7 @@ async def test_default_logging_with_fd(
     fdsock = socket.socket(socket.AF_UNIX, socket.SOCK_STREAM)
     fd = fdsock.fileno()
     config = Config(app=app, use_colors=use_colors, log_config=logging_config, fd=fd)
+    sock = config.bind_socket()
     with caplog_for_logger(caplog, "uvicorn.access"):
         async with run_server(config):
             print(fd)
@@ -242,7 +243,8 @@ async def test_default_logging_with_fd(
             record.message for record in caplog.records if "uvicorn" in record.name
         ]
         print(messages)
-        # assert False
+        assert sock.family == fdsock.family
+        assert False
         # assert "Started server process" in messages.pop(0)
         # assert "Waiting for application startup" in messages.pop(0)
         # assert "ASGI 'lifespan' protocol appears unsupported" in messages.pop(0)
