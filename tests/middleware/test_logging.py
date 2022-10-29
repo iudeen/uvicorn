@@ -1,6 +1,7 @@
 import contextlib
 import logging
 import os
+import socket
 import sys
 from hashlib import md5
 from pathlib import Path
@@ -220,6 +221,34 @@ async def test_default_logging_with_uds(
         assert "ASGI 'lifespan' protocol appears unsupported" in messages.pop(0)
         assert "Application startup complete" in messages.pop(0)
         assert "Uvicorn running on unix socket " + short_socket_name in messages.pop(0)
+        assert '"GET / HTTP/1.1" 204' in messages.pop(0)
+        assert "Shutting down" in messages.pop(0)
+
+
+@pytest.mark.anyio
+@pytest.mark.parametrize("use_colors", [(True), (False)])
+@pytest.mark.skipif(sys.platform == "win32", reason="require unix-like system")
+async def test_default_logging_with_fd(
+    use_colors, caplog, logging_config
+):  # pragma: py-win32
+    fdsock = socket.socket(socket.AF_UNIX, socket.SOCK_STREAM)
+    fd = fdsock.fileno()
+    config = Config(app=app, use_colors=use_colors, log_config=logging_config, fd=fd)
+    with caplog_for_logger(caplog, "uvicorn.access"):
+        async with run_server(config):
+            transport = httpx.AsyncHTTPTransport()
+            async with httpx.AsyncClient(transport=transport) as client:
+                response = await client.get(f"http://{fdsock.getsockname()}")
+        assert response.status_code == 204
+
+        messages = [
+            record.message for record in caplog.records if "uvicorn" in record.name
+        ]
+        assert "Started server process" in messages.pop(0)
+        assert "Waiting for application startup" in messages.pop(0)
+        assert "ASGI 'lifespan' protocol appears unsupported" in messages.pop(0)
+        assert "Application startup complete" in messages.pop(0)
+        assert "Uvicorn running on socket " + fdsock.getsockname() in messages.pop(0)
         assert '"GET / HTTP/1.1" 204' in messages.pop(0)
         assert "Shutting down" in messages.pop(0)
 
