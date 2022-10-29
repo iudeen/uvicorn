@@ -233,7 +233,9 @@ async def test_default_logging_with_fd(
 ):  # pragma: py-win32
     fdsock = socket.socket(socket.AF_UNIX, socket.SOCK_STREAM)
     fd = fdsock.fileno()
-    config = Config(app=app, use_colors=use_colors, log_config=logging_config, fd=fd, lifespan="off")
+    config = Config(
+        app=app, use_colors=use_colors, log_config=logging_config, fd=fd, lifespan="off"
+    )
     with caplog_for_logger(caplog, "uvicorn.access"):
         async with run_server(config):
             print(fd)
