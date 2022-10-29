@@ -75,6 +75,7 @@ def short_socket_name(tmp_path, tmp_path_factory):  # pragma: py-win32
                 yield sock_path
                 return
 
+
 @pytest.mark.anyio
 async def test_trace_logging(caplog, logging_config):
     config = Config(
@@ -196,7 +197,9 @@ async def test_default_logging(use_colors, caplog, logging_config):
 
 @pytest.mark.anyio
 @pytest.mark.parametrize("use_colors", [(True), (False)])
-async def test_default_logging_with_uds(use_colors, caplog, logging_config, short_socket_name):
+async def test_default_logging_with_uds(
+    use_colors, caplog, logging_config, short_socket_name
+):
     config = Config(
         app=app, use_colors=use_colors, log_config=logging_config, uds=short_socket_name
     )
