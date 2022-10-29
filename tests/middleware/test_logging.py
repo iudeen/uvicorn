@@ -158,7 +158,9 @@ async def test_default_logging(use_colors, caplog, logging_config):
 @pytest.mark.anyio
 @pytest.mark.parametrize("use_colors", [(True), (False)])
 async def test_default_logging_with_uds(use_colors, caplog, logging_config):
-    config = Config(app=app, use_colors=use_colors, log_config=logging_config, uds="workers")
+    config = Config(
+        app=app, use_colors=use_colors, log_config=logging_config, uds="workers"
+    )
     with caplog_for_logger(caplog, "uvicorn.access"):
         async with run_server(config):
             async with httpx.AsyncClient() as client:
