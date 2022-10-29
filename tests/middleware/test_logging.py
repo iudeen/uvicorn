@@ -214,7 +214,7 @@ async def test_default_logging_with_uds(
         assert "Waiting for application startup" in messages.pop(0)
         assert "ASGI 'lifespan' protocol appears unsupported" in messages.pop(0)
         assert "Application startup complete" in messages.pop(0)
-        assert "Uvicorn running on unix socket" in messages.pop(0)
+        assert "Uvicorn running on unix socket " + short_socket_name in messages.pop(0)
         assert "Shutting down" in messages.pop(0)
 
 
