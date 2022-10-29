@@ -1,5 +1,10 @@
 import contextlib
 import logging
+import os
+from hashlib import md5
+from pathlib import Path
+from tempfile import TemporaryDirectory
+from uuid import uuid4
 
 import httpx
 import pytest
@@ -35,6 +40,40 @@ async def app(scope, receive, send):
     await send({"type": "http.response.start", "status": 204, "headers": []})
     await send({"type": "http.response.body", "body": b"", "more_body": False})
 
+
+@pytest.fixture
+def short_socket_name(tmp_path, tmp_path_factory):  # pragma: py-win32
+    max_sock_len = 100
+    socket_filename = "my.sock"
+    identifier = f"{uuid4()}-"
+    identifier_len = len(identifier.encode())
+    tmp_dir = Path("/tmp").resolve()
+    os_tmp_dir = Path(os.getenv("TMPDIR", "/tmp")).resolve()
+    basetemp = Path(
+        str(tmp_path_factory.getbasetemp()),
+    ).resolve()
+    hash_basetemp = md5(
+        str(basetemp).encode(),
+    ).hexdigest()
+
+    def make_tmp_dir(base_dir):
+        return TemporaryDirectory(
+            dir=str(base_dir),
+            prefix="p-",
+            suffix=f"-{hash_basetemp}",
+        )
+
+    paths = basetemp, os_tmp_dir, tmp_dir
+    for num, tmp_dir_path in enumerate(paths, 1):
+        with make_tmp_dir(tmp_dir_path) as tmpd:
+            tmpd = Path(tmpd).resolve()
+            sock_path = str(tmpd / socket_filename)
+            sock_path_len = len(sock_path.encode())
+            if sock_path_len <= max_sock_len:
+                if max_sock_len - sock_path_len >= identifier_len:  # pragma: no cover
+                    sock_path = str(tmpd / "".join((identifier, socket_filename)))
+                yield sock_path
+                return
 
 @pytest.mark.anyio
 async def test_trace_logging(caplog, logging_config):
@@ -157,9 +196,9 @@ async def test_default_logging(use_colors, caplog, logging_config):
 
 @pytest.mark.anyio
 @pytest.mark.parametrize("use_colors", [(True), (False)])
-async def test_default_logging_with_uds(use_colors, caplog, logging_config):
+async def test_default_logging_with_uds(use_colors, caplog, logging_config, short_socket_name):
     config = Config(
-        app=app, use_colors=use_colors, log_config=logging_config, uds="workers"
+        app=app, use_colors=use_colors, log_config=logging_config, uds=short_socket_name
     )
     with caplog_for_logger(caplog, "uvicorn.access"):
         async with run_server(config):
