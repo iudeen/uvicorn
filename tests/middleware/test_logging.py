@@ -211,14 +211,11 @@ async def test_default_logging_with_uds(
         messages = [
             record.message for record in caplog.records if "uvicorn" in record.name
         ]
-        print(messages)
-        assert False
         assert "Started server process" in messages.pop(0)
         assert "Waiting for application startup" in messages.pop(0)
         assert "ASGI 'lifespan' protocol appears unsupported" in messages.pop(0)
         assert "Application startup complete" in messages.pop(0)
-        assert "Uvicorn running on http://127.0.0.1:8000" in messages.pop(0)
-        assert '"GET / HTTP/1.1" 204' in messages.pop(0)
+        assert "Uvicorn running on unix socket" in messages.pop(0)
         assert "Shutting down" in messages.pop(0)
 
 
