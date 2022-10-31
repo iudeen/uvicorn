@@ -196,7 +196,7 @@ async def test_default_logging_with_fd(
     fd = fdsock.fileno()
     config = Config(app=app, use_colors=use_colors, log_config=logging_config, fd=fd)
     with caplog_for_logger(caplog, "uvicorn.access"):
-        async with run_server(config):
+        async with run_server(config, fdsock):
             await asyncio.sleep(0.1)
             fdsock.listen(9)
         messages = [
