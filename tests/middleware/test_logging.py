@@ -188,7 +188,10 @@ async def test_default_logging_with_uds(
 
 @pytest.mark.anyio
 @pytest.mark.parametrize("use_colors", [(True), (False)])
-async def test_default_logging_with_fd(use_colors, caplog, logging_config):
+@pytest.mark.skipif(sys.platform == "win32", reason="require unix-like system")
+async def test_default_logging_with_fd(
+    use_colors, caplog, logging_config
+):  # pragma: py-win32
     fdsock = socket.socket(socket.AF_INET, socket.SOCK_STREAM)
     fd = fdsock.fileno()
     config = Config(app=app, use_colors=use_colors, log_config=logging_config, fd=fd)
