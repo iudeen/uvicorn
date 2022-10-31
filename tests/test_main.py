@@ -130,7 +130,7 @@ def test_run_match_config_params() -> None:
 
 @pytest.mark.anyio
 @pytest.mark.skipif(sys.platform == "win32", reason="require unix-like system")
-async def test_run_multiprocess_with_sockets(caplog):
+async def test_run_multiprocess_with_sockets(caplog, short_socket_name):
     if os.path.exists("/tmp/socket_test.s"):
         os.remove("/tmp/socket_test.s")
     config = Config(app=app, workers=2, limit_max_requests=1)
@@ -138,7 +138,7 @@ async def test_run_multiprocess_with_sockets(caplog):
     with caplog_for_logger(caplog, "uvicorn.access"):
         async with run_server(config, sockets=[sock]):
             await asyncio.sleep(1)
-            sock.bind("/tmp/socket_test.s")
+            sock.bind(short_socket_name)
             sock.listen(9)
         messages = [
             record.message for record in caplog.records if "uvicorn" in record.name
