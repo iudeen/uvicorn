@@ -1,3 +1,4 @@
+import asyncio
 import inspect
 import socket
 import sys
@@ -133,6 +134,5 @@ async def test_run_with_socket():
     config = Config(app=app, loop="asyncio", reload=True, limit_max_requests=1, workers=1, fd=fd)
     sock = config.bind_socket()
     async with run_server(config, sockets=[sock]):
-        async with httpx.AsyncClient() as client:
-            response = await client.get("http://127.0.0.1:8000")
-    assert response.status_code == 204
+        asyncio.sleep(0.1)
+        print(sock.getsockname())
