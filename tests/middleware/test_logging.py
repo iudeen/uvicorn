@@ -205,6 +205,7 @@ async def test_default_logging_with_fd(use_colors, caplog, logging_config):
         assert "Application startup complete" in messages.pop(0)
         assert f"Uvicorn running on socket {fdsock.getsockname()}" in messages.pop(0)
         assert "Shutting down" in messages.pop(0)
+    fdsock.close()
 
 
 @pytest.mark.anyio
