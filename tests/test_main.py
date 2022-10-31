@@ -1,7 +1,6 @@
 import asyncio
 import inspect
 import socket
-import sys
 from logging import WARNING
 
 import httpx
