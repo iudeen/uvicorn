@@ -176,6 +176,7 @@ class Server:
 
         if config.fd is not None:
             sock = listeners[0]
+            logger.info(listeners)  # added for testing only-remove it!
             logger.info(
                 "Uvicorn running on socket %s (Press CTRL+C to quit)",
                 sock.getsockname(),
