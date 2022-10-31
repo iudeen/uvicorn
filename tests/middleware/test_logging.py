@@ -203,7 +203,7 @@ async def test_default_logging_with_fd(use_colors, caplog, logging_config):
         assert "Waiting for application startup" in messages.pop(0)
         assert "ASGI 'lifespan' protocol appears unsupported" in messages.pop(0)
         assert "Application startup complete" in messages.pop(0)
-        assert "Uvicorn running on socket " + fdsock.getsockname() in messages.pop(0)
+        assert f"Uvicorn running on socket {fdsock.getsockname()}" in messages.pop(0)
         assert "Shutting down" in messages.pop(0)
 
 
