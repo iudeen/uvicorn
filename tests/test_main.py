@@ -136,5 +136,6 @@ async def test_run_with_socket():
     )
     sock = config.bind_socket()
     async with run_server(config, sockets=[sock]):
-        asyncio.sleep(0.1)
+        await asyncio.sleep(0.1)
         print(sock.getsockname())
+        assert False
