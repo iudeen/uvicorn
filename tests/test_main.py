@@ -1,5 +1,6 @@
 import inspect
 import socket
+import sys
 from logging import WARNING
 
 import httpx
@@ -122,3 +123,16 @@ def test_run_match_config_params() -> None:
         if key not in ("app_dir",)
     }
     assert config_params == run_params
+
+
+@pytest.mark.anyio
+@pytest.mark.skipif(sys.platform == "win32", reason="require unix-like system")
+async def test_run_with_socket():
+    sock_ = socket.socket(socket.AF_UNIX, socket.SOCK_STREAM)
+    fd = sock_.fileno()
+    config = Config(app=app, loop="asyncio", reload=True, limit_max_requests=1, workers=1, fd=fd)
+    sock = config.bind_socket()
+    async with run_server(config, sockets=[sock]):
+        async with httpx.AsyncClient() as client:
+            response = await client.get("http://127.0.0.1:8000")
+    assert response.status_code == 204
