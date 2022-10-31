@@ -138,7 +138,7 @@ async def test_run_multiprocess_with_sockets(caplog):
     with caplog_for_logger(caplog, "uvicorn.access"):
         async with run_server(config, sockets=[sock]):
             await asyncio.sleep(1)
-            sock.connect("/tmp/socket_test.s")
+            sock.bind("/tmp/socket_test.s")
             sock.listen(9)
         messages = [
             record.message for record in caplog.records if "uvicorn" in record.name
