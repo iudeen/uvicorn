@@ -201,8 +201,7 @@ async def test_default_logging_with_fd(
             sock.listen(9)
             conn, address = sock.accept()
             # print the address of connection
-            print('Connected with ' + address[0] + ':'
-                  + str(address[1]))
+            print("Connected with " + address[0] + ":" + str(address[1]))
         messages = [
             record.message for record in caplog.records if "uvicorn" in record.name
         ]
