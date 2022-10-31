@@ -195,22 +195,15 @@ async def test_default_logging_with_fd(use_colors, caplog, logging_config):
     with caplog_for_logger(caplog, "uvicorn.access"):
         async with run_server(config):
             await asyncio.sleep(0.1)
-            # fdsock.connect(("", 8000))
             fdsock.listen(9)
-            fdsock.getsockname()
-            # conn, address = fdsock.accept()
-            # print the address of connection
-            # print("Connected with " + address[0] + ":" + str(address[1]))
         messages = [
             record.message for record in caplog.records if "uvicorn" in record.name
         ]
-        print(messages)
-        assert False
         assert "Started server process" in messages.pop(0)
         assert "Waiting for application startup" in messages.pop(0)
         assert "ASGI 'lifespan' protocol appears unsupported" in messages.pop(0)
         assert "Application startup complete" in messages.pop(0)
-        assert "Uvicorn running on socket " in messages.pop(0)
+        assert "Uvicorn running on socket " + fdsock.getsockname() in messages.pop(0)
         assert "Shutting down" in messages.pop(0)
 
 
