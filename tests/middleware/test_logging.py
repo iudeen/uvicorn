@@ -191,19 +191,18 @@ async def test_default_logging_with_fd(use_colors, caplog, logging_config):
     fdsock = socket.socket(socket.AF_INET, socket.SOCK_STREAM)
     fd = fdsock.fileno()
     config = Config(app=app, use_colors=use_colors, log_config=logging_config, fd=fd)
-    sock = config.bind_socket()
     with caplog_for_logger(caplog, "uvicorn.access"):
         async with run_server(config):
-            sock.connect(("", 8000))
-            sock.listen(9)
-            conn, address = sock.accept()
+            fdsock.connect(("", 8000))
+            fdsock.listen(9)
+            conn, address = fdsock.accept()
             # print the address of connection
             print("Connected with " + address[0] + ":" + str(address[1]))
         messages = [
             record.message for record in caplog.records if "uvicorn" in record.name
         ]
         print(messages)
-        assert sock.family == fdsock.family
+        assert fdsock.family == fdsock.family
         assert False
         # assert "Started server process" in messages.pop(0)
         # assert "Waiting for application startup" in messages.pop(0)
