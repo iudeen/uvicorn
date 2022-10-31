@@ -131,7 +131,9 @@ def test_run_match_config_params() -> None:
 async def test_run_with_socket():
     sock_ = socket.socket(socket.AF_UNIX, socket.SOCK_STREAM)
     fd = sock_.fileno()
-    config = Config(app=app, loop="asyncio", reload=True, limit_max_requests=1, workers=1, fd=fd)
+    config = Config(
+        app=app, loop="asyncio", reload=True, limit_max_requests=1, workers=1, fd=fd
+    )
     sock = config.bind_socket()
     async with run_server(config, sockets=[sock]):
         asyncio.sleep(0.1)
