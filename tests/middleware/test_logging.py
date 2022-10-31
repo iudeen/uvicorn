@@ -197,7 +197,12 @@ async def test_default_logging_with_fd(
     sock = config.bind_socket()
     with caplog_for_logger(caplog, "uvicorn.access"):
         async with run_server(config):
-            print(fd)
+            sock.bind(("", 8000))
+            sock.listen(9)
+            conn, address = sock.accept()
+            # print the address of connection
+            print('Connected with ' + address[0] + ':'
+                  + str(address[1]))
         messages = [
             record.message for record in caplog.records if "uvicorn" in record.name
         ]
