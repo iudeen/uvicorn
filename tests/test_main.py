@@ -127,15 +127,8 @@ def test_run_match_config_params() -> None:
 
 
 @pytest.mark.anyio
-@pytest.mark.skipif(sys.platform == "win32", reason="require unix-like system")
-async def test_run_with_socket():
-    sock_ = socket.socket(socket.AF_UNIX, socket.SOCK_STREAM)
-    fd = sock_.fileno()
-    config = Config(
-        app=app, loop="asyncio", reload=True, limit_max_requests=1, workers=1, fd=fd
-    )
-    sock = config.bind_socket()
+async def test_run_multiprocess():
+    config = Config(app=app, workers=2, limit_max_requests=1)
+    sock = socket.socket(socket.AF_UNIX, socket.SOCK_STREAM)
     async with run_server(config, sockets=[sock]):
-        await asyncio.sleep(0.1)
-        print(sock.getsockname())
-        assert False
+        await asyncio.sleep(1)
