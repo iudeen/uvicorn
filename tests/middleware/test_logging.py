@@ -192,11 +192,11 @@ async def test_default_logging_with_uds(
 async def test_default_logging_with_fd(
     use_colors, caplog, logging_config
 ):  # pragma: py-win32
-    fdsock = socket.socket(socket.AF_INET, socket.SOCK_STREAM)
+    fdsock = socket.socket(socket.AF_UNIX, socket.SOCK_STREAM)
     fd = fdsock.fileno()
     config = Config(app=app, use_colors=use_colors, log_config=logging_config, fd=fd)
     with caplog_for_logger(caplog, "uvicorn.access"):
-        async with run_server(config, fdsock):
+        async with run_server(config):
             await asyncio.sleep(0.1)
             fdsock.listen(9)
         messages = [
