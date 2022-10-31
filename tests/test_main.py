@@ -1,11 +1,13 @@
 import asyncio
 import inspect
 import socket
+import sys
 from logging import WARNING
 
 import httpx
 import pytest
 
+from tests.middleware.test_logging import caplog_for_logger
 from tests.utils import run_server
 from uvicorn.config import Config
 from uvicorn.main import run
@@ -126,8 +128,15 @@ def test_run_match_config_params() -> None:
 
 
 @pytest.mark.anyio
-async def test_run_multiprocessk():
+@pytest.mark.skipif(sys.platform == "win32", reason="require unix-like system")
+async def test_run_multiprocess_with_sockets(caplog):
     config = Config(app=app, workers=2, limit_max_requests=1)
     sock = socket.socket(socket.AF_UNIX, socket.SOCK_STREAM)
-    async with run_server(config, sockets=[sock]):
-        await asyncio.sleep(1)
+    with caplog_for_logger(caplog, "uvicorn.access"):
+        async with run_server(config, sockets=[sock]):
+            await asyncio.sleep(1)
+        messages = [
+            record.message for record in caplog.records if "uvicorn" in record.name
+        ]
+        print(messages)
+        assert False
