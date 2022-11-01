@@ -234,7 +234,7 @@ async def test_unknown_status_code(caplog):
 
 
 @pytest.mark.anyio
-@pytest.mark.parametrize("use_colors", [(True), (False)])
+@pytest.mark.parametrize("use_colors", [True, False])
 async def test_default_logging_with_port_zero(use_colors, caplog, logging_config):
     config = Config(app=app, use_colors=use_colors, log_config=logging_config, port=0)
     with caplog_for_logger(caplog, "uvicorn.access"):
@@ -242,9 +242,8 @@ async def test_default_logging_with_port_zero(use_colors, caplog, logging_config
             while not server.started:
                 await asyncio.sleep(0.1)
             for s in server.servers:
-                for socks in s.sockets:
-                    host, port = socks.getsockname()
-
+                for sock in s.sockets:
+                    host, port = sock.getsockname()
         messages = [
             record.message for record in caplog.records if "uvicorn" in record.name
         ]
