@@ -7,6 +7,7 @@ import httpx
 import pytest
 
 from tests.utils import run_server
+from uvicorn import Server
 from uvicorn.config import Config
 from uvicorn.main import run
 
@@ -134,3 +135,13 @@ async def test_run_multiprocess_with_sockets():
             while not server.started:
                 await asyncio.sleep(0.1)
             await asyncio.sleep(0.1)
+
+
+@pytest.mark.anyio
+async def test_run_invalid_host() -> None:
+    with pytest.raises(SystemExit) as e:
+        config = Config(app=app, host="illegal_host")
+        server = Server(config=config)
+        await server.serve()
+    assert e.type == SystemExit
+    assert e.value.code == 1
