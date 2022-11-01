@@ -1,6 +1,7 @@
 import asyncio
 import inspect
 import socket
+import sys
 from logging import WARNING
 
 import httpx
@@ -128,7 +129,8 @@ def test_run_match_config_params() -> None:
 @pytest.mark.anyio
 async def test_run_multiprocess_with_sockets():
     config = Config(app=app, workers=2, limit_max_requests=1)
-    with socket.create_server(("0.0.0.0", 0)) as sock:
+    with socket.socket() as sock:
+        sock.bind(("localhost", 0))
         async with run_server(config, sockets=[sock]) as server:
             while not server.started:
                 await asyncio.sleep(0.1)
