@@ -128,7 +128,6 @@ def test_run_match_config_params() -> None:
 @pytest.mark.anyio
 async def test_run_multiprocess_with_sockets():
     config = Config(app=app, workers=2, limit_max_requests=1)
-    sock = socket.socket(socket.AF_INET, socket.SOCK_STREAM)
-    async with run_server(config, sockets=[sock]):
-        await asyncio.sleep(0.1)
-    sock.close()
+    with socket.socket(socket.AF_INET, socket.SOCK_STREAM) as sock:
+        async with run_server(config, sockets=[sock]):
+            await asyncio.sleep(0.1)
