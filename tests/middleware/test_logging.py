@@ -239,8 +239,12 @@ async def test_default_logging_with_port_zero(use_colors, caplog, logging_config
     config = Config(app=app, use_colors=use_colors, log_config=logging_config, port=0)
     with caplog_for_logger(caplog, "uvicorn.access"):
         async with run_server(config) as server:
-            host, port = server.servers[0].sockets[0].getsocketname()
-            await asyncio.sleep(0.1)
+            while not server.started:
+                await asyncio.sleep(0.1)
+            for s in server.servers:
+                for socks in s.sockets:
+                    host, port = socks.getsockname()
+
         messages = [
             record.message for record in caplog.records if "uvicorn" in record.name
         ]
@@ -248,5 +252,5 @@ async def test_default_logging_with_port_zero(use_colors, caplog, logging_config
         assert "Waiting for application startup" in messages.pop(0)
         assert "ASGI 'lifespan' protocol appears unsupported" in messages.pop(0)
         assert "Application startup complete" in messages.pop(0)
-        assert f"Uvicorn running on {host}:{port}" in messages.pop(0)
+        assert f"Uvicorn running on http://{host}:{port}" in messages.pop(0)
         assert "Shutting down" in messages.pop(0)
