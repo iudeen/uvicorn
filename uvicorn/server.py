@@ -102,7 +102,7 @@ class Server:
             # Explicitly passed a list of open sockets.
             # We use this when the server is run from a Gunicorn worker.
 
-            def _share_socket(sock: socket.SocketType) -> socket.SocketType:
+            def _share_socket(sock: socket.SocketType) -> socket.SocketType:  # pragma py-linux pragma: py-darwin
                 # Windows requires the socket be explicitly shared across
                 # multiple workers (processes).
                 from socket import fromshare  # type: ignore

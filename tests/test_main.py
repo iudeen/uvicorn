@@ -131,3 +131,4 @@ async def test_run_multiprocess_with_sockets():
     sock = socket.socket(socket.AF_INET, socket.SOCK_STREAM)
     async with run_server(config, sockets=[sock]):
         await asyncio.sleep(0.1)
+    sock.close()
